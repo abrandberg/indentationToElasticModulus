@@ -1,5 +1,8 @@
-function compareSolutionScheme()
+function compareSolutionScheme(ctrl,modelsToCompare)
 %
+% 1. Vlassak
+% 2. Jäger
+% 3. Delafargue
 %
 % References:
 %
@@ -13,13 +16,61 @@ function compareSolutionScheme()
 %     International Journal of Solids and Structures, 41(26), 7351–7360. 
 %     https://doi.org/10.1016/j.ijsolstr.2004.06.019
 
+
+plotDims = [2 3];
+plotDims = [3 2];
     
 % Numerical results from Jägers first article.
 % Numerical results extracted manually from Figure 4 in [1]
-[ELJager0, ELJager90, ETJager0,ETJager90,GLTJager0,GLTJager90,nuttJager0,nuttJager90,] = importJagerFigure4();
+if modelsToCompare(2)
+    [ELJager0, ELJager90, ETJager0,ETJager90,GLTJager0,GLTJager90,nuttJager0,nuttJager90,] = importJagerFigure4();
+end
 
+legendText = {};
+if modelsToCompare(3)
+    legendText{end+1} = 'D\&U, $M_L$';
+    legendText{end+1} = 'D\&U, $M_T$';
+end
+if modelsToCompare(1)
+    legendText{end+1} = 'V et al, 0$^\circ$';
+    legendText{end+1} = 'V et al, 90$^\circ$';    
+%     legendText{end+1} = 'Indentation along fiber axis';
+%     legendText{end+1} = 'Indentation in transverse direction';    
+%     legendText{end+1} = 'Equality';    
+end
+if modelsToCompare(2)
+    legendText{end+1} = 'J et al, 0$^\circ$';
+    legendText{end+1} = 'J et al, 90$^\circ$';    
+end
 
+fontSize = 10;
 
+if strcmp(ctrl.interpreter,'tex')
+    xAxisText = {'E_L [GPa]',    ...
+                 'E_T [GPa]',    ...
+                 'G_{LT} [GPa]', ...
+                 '\nu_{TL} [-]', ...
+                 '\nu_{TT} [-]', ...
+                 'MFA [Deg]'};
+    yAxisText = 'M [GPa]';
+    legendText = strrep(legendText,'$','');
+    legendText = strrep(legendText,'\&','&');
+elseif strcmp(ctrl.interpreter,'latex')
+    xAxisText = {'$E_L$ [GPa]',    ...
+                 '$E_T$ [GPa]',    ...
+                 '$G_{LT}$ [GPa]', ...
+                 '$\nu_{TL}$ [-]', ...
+                 '$\nu_{TT}$ [-]', ...
+                 '$MFA$ [Deg]'};
+    yAxisText = '$M$ [GPa]';
+end
+
+linePlotInstructions = {'linewidth',ctrl.linewidth};
+axisPlotInstructions = {'TickLabelInterpreter',ctrl.interpreter, ...
+                        'fontsize',fontSize,                     ...
+                        'YMinorGrid',1,'XMinorTick',1};
+
+yLimVals = [5 30];
 
 % Baseline values used in Figure 4
 El = 55*1e0;
@@ -36,9 +87,9 @@ nutlTry = [linspace(0,0.49,20) 0.25];
 nuttTry = [linspace(0,0.49,20) 0.25];
 MFAToTry = [0 90];
 
-% Loop over the values used in [1] to generate comparison.
-figure;
-subplot(3,2,2)
+% Loop over the values used in [1] to generate comparison.  
+figure('color','w','units','centimeters','OuterPosition',[10 10 24 24]);
+subplot(plotDims(1),plotDims(2),2)
 for aLoop = 1:length(ELTry)
     El = ELTry(aLoop);   
 
@@ -51,25 +102,34 @@ for aLoop = 1:length(ELTry)
     end
 
 end
-plot(ELTry,MIndentDU(:,1),'bs-','MarkerFaceColor','b')
+if modelsToCompare(3)
+    plot(ELTry,MIndentDU(:,1),'Marker',ctrl.marker{1},linePlotInstructions{:});
+    hold on
+    plot(ELTry,MIndentDU(:,2),'Marker',ctrl.marker{2},linePlotInstructions{:});
+end
+plot(ELTry,MindentVlassak(:,1),'Marker',ctrl.marker{3},linePlotInstructions{:});
 hold on
-plot(ELTry,MIndentDU(:,2),'bs-.','MarkerFaceColor','b')
-plot(ELTry,MindentVlassak(:,1),'r^-','MarkerFaceColor','r')
-plot(ELTry,MindentVlassak(:,2),'r^-.','MarkerFaceColor','r')
-xlabel('$E_L$ [GPa]','interpreter','latex')
-ylabel('$M$ [GPa]','interpreter','latex')
-plot(ELJager90(:,1),ELJager90(:,2),'ko-','MarkerFaceColor','k')
-plot(ELJager0(:,1),ELJager0(:,2),'ko-.','MarkerFaceColor','k')
-legend('D\&U, $M_L$','D\&U, $M_T$',...
-       'V et al, 90$^\circ$','V et al, 0$^\circ$',...
-       'J et al, 90$^\circ$','J et al, 0$^\circ$','location','best','interpreter','latex')
-set(gca,'TickLabelInterpreter','latex','fontsize',14)
+plot(ELTry,MindentVlassak(:,2),'Marker',ctrl.marker{4},linePlotInstructions{:});
+xlabel(xAxisText{1},'interpreter',ctrl.interpreter)
+ylabel(yAxisText,'interpreter',ctrl.interpreter)
+if modelsToCompare(2)
+    plot(ELJager0(:,1),ELJager0(:,2),'Marker',ctrl.marker{5},linePlotInstructions{:});
+    hold on
+    plot(ELJager90(:,1),ELJager90(:,2),'Marker',ctrl.marker{6},linePlotInstructions{:});
+end
+
+set(gca,axisPlotInstructions{:})
 xlim([20 90])
-ylim([5 35])
+ylim(yLimVals)
+% axis equal
+% plot([0 80],[0 80],'k-.')
+% legend(legendText,'location','best','interpreter',ctrl.interpreter)
+% xlim([0 80])
+% ylim([0 80])
 pause(0.5)
 
 clear MIndentDU MindentVlassak
-subplot(3,2,1)    
+subplot(plotDims(1),plotDims(2),1)    
 for aLoop = 1:length(ETTry)
     Et = ETTry(aLoop);   
     MIndent = delafargueAndUlmMethod([El, Et, Glt, nutt, nutl],'Cone');
@@ -81,26 +141,29 @@ for aLoop = 1:length(ETTry)
     end
 
 end
-plot(ETTry,MIndentDU(:,1),'bs-','MarkerFaceColor','b')
+if modelsToCompare(3)
+    plot(ETTry,MIndentDU(:,1),'Marker',ctrl.marker{1},linePlotInstructions{:});
+    hold on
+    plot(ETTry,MIndentDU(:,2),'Marker',ctrl.marker{2},linePlotInstructions{:});
+end
+plot(ETTry,MindentVlassak(:,1),'Marker',ctrl.marker{3},linePlotInstructions{:});
 hold on
-plot(ETTry,MIndentDU(:,2),'bs-.','MarkerFaceColor','b')
-plot(ETTry,MindentVlassak(:,1),'r^-','MarkerFaceColor','r')
-plot(ETTry,MindentVlassak(:,2),'r^-.','MarkerFaceColor','r')
-xlabel('$E_T$ [GPa]','interpreter','latex')
-ylabel('$M$ [GPa]','interpreter','latex')
-plot(ETJager90(:,1),ETJager90(:,2),'ko-','MarkerFaceColor','k')
-plot(ETJager0(:,1),ETJager0(:,2),'ko-.','MarkerFaceColor','k')
-legend('D\&U, $M_L$','D\&U, $M_T$',...
-       'V et al, 90$^\circ$','V et al, 0$^\circ$',...
-       'J et al, 90$^\circ$','J et al, 0$^\circ$','location','best','interpreter','latex')
-set(gca,'TickLabelInterpreter','latex','fontsize',14) 
-xlim([0 20])
-ylim([5 35])
+plot(ETTry,MindentVlassak(:,2),'Marker',ctrl.marker{4},linePlotInstructions{:});
+xlabel(xAxisText{2},'interpreter',ctrl.interpreter)
+ylabel(yAxisText,'interpreter',ctrl.interpreter)
+if modelsToCompare(2)
+    plot(ETJager0(:,1),ETJager0(:,2),'Marker',ctrl.marker{5},linePlotInstructions{:});
+    plot(ETJager90(:,1),ETJager90(:,2),'Marker',ctrl.marker{6},linePlotInstructions{:});
+end
+
+set(gca,axisPlotInstructions{:})
+xlim([3 18])
+ylim(yLimVals)
 pause(0.5)
 
 
 clear MIndentDU MindentVlassak
-subplot(3,2,3)  
+subplot(plotDims(1),plotDims(2),3)  
 for aLoop = 1:length(GLTTry)
     Glt = GLTTry(aLoop);  
     MIndent = delafargueAndUlmMethod([El, Et, Glt, nutt, nutl],'Cone');
@@ -111,27 +174,30 @@ for aLoop = 1:length(GLTTry)
         MindentVlassak(aLoop,bLoop) = MIndent(1);
     end
 end
-plot(GLTTry,MIndentDU(:,1),'bs-','MarkerFaceColor','b')
+if modelsToCompare(3)
+    plot(GLTTry,MIndentDU(:,1),'Marker',ctrl.marker{1},linePlotInstructions{:});
+    hold on
+    plot(GLTTry,MIndentDU(:,2),'Marker',ctrl.marker{2},linePlotInstructions{:});
+end
+
+plot(GLTTry,MindentVlassak(:,1),'Marker',ctrl.marker{3},linePlotInstructions{:});
 hold on
-plot(GLTTry,MIndentDU(:,2),'bs-.','MarkerFaceColor','b')
-plot(GLTTry,MindentVlassak(:,1),'r^-','MarkerFaceColor','r')
-plot(GLTTry,MindentVlassak(:,2),'r^-.','MarkerFaceColor','r')
-plot(GLTJager90(:,1),GLTJager90(:,2),'ko-','MarkerFaceColor','k')
-plot(GLTJager0(:,1),GLTJager0(:,2),'ko-.','MarkerFaceColor','k')
-xlabel('$G_{LT}$ [GPa]','interpreter','latex')
-ylabel('$M$ [GPa]','interpreter','latex')
-plot(GLTJager90(:,1),GLTJager90(:,2),'ko-','MarkerFaceColor','k')
-plot(GLTJager0(:,1),GLTJager0(:,2),'ko-.','MarkerFaceColor','k')
-legend('D\&U, $M_L$','D\&U, $M_T$',...
-       'V et al, 90$^\circ$','V et al, 0$^\circ$',...
-       'J et al, 90$^\circ$','J et al, 0$^\circ$','location','best','interpreter','latex')
-set(gca,'TickLabelInterpreter','latex','fontsize',14) 
+plot(GLTTry,MindentVlassak(:,2),'Marker',ctrl.marker{4},linePlotInstructions{:});
+if modelsToCompare(2)
+    plot(GLTJager0(:,1),GLTJager0(:,2),'Marker',ctrl.marker{5},linePlotInstructions{:});
+    hold on
+    plot(GLTJager90(:,1),GLTJager90(:,2),'Marker',ctrl.marker{6},linePlotInstructions{:});
+end
+xlabel(xAxisText{3},'interpreter',ctrl.interpreter)
+ylabel(yAxisText,'interpreter',ctrl.interpreter)
+
+set(gca,axisPlotInstructions{:})
 xlim([0 6])
-ylim([5 35])
+ylim(yLimVals)
 pause(0.5)
 
 clear MIndentDU MindentVlassak
-subplot(3,2,4)
+subplot(plotDims(1),plotDims(2),4)
 for aLoop = 1:length(nutlTry)
     nutl = nutlTry(aLoop);
     
@@ -143,25 +209,24 @@ for aLoop = 1:length(nutlTry)
         MindentVlassak(aLoop,bLoop) = MIndent(1);
     end
 end
-plot(nutlTry,MIndentDU(:,1),'bs-','MarkerFaceColor','b')
+if modelsToCompare(3)
+    plot(nutlTry,MIndentDU(:,1),'Marker',ctrl.marker{1},linePlotInstructions{:});
+    hold on
+    plot(nutlTry,MIndentDU(:,2),'Marker',ctrl.marker{2},linePlotInstructions{:});
+end
+plot(nutlTry,MindentVlassak(:,1),'Marker',ctrl.marker{3},linePlotInstructions{:});
 hold on
-plot(nutlTry,MIndentDU(:,2),'bs-.','MarkerFaceColor','b')
-plot(nutlTry,MindentVlassak(:,1),'r^-','MarkerFaceColor','r')
-plot(nutlTry,MindentVlassak(:,2),'r^-.','MarkerFaceColor','r')
-xlabel('$\nu_{TL}$ [-]','interpreter','latex')
-ylabel('$M$ [GPa]','interpreter','latex')
-% plot(GLTJager90(:,1),GLTJager90(:,2),'ko-','MarkerFaceColor','k')
-% plot(GLTJager0(:,1),GLTJager0(:,2),'ko-.','MarkerFaceColor','k')
-legend('D\&U, $M_L$','D\&U, $M_T$',...
-       'V et al, 90$^\circ$','V et al, 0$^\circ$',...
-       'J et al, 90$^\circ$','J et al, 0$^\circ$','location','best','interpreter','latex')
-set(gca,'TickLabelInterpreter','latex','fontsize',14) 
+plot(nutlTry,MindentVlassak(:,2),'Marker',ctrl.marker{4},linePlotInstructions{:});
+xlabel(xAxisText{4},'interpreter',ctrl.interpreter)
+ylabel(yAxisText,'interpreter',ctrl.interpreter)
+
+set(gca,axisPlotInstructions{:})
 xlim([0 0.6])
-ylim([5 35])
+ylim(yLimVals)
 pause(0.5)
  
 clear MIndentDU MindentVlassak
-subplot(3,2,5)
+subplot(plotDims(1),plotDims(2),5)
 for aLoop = 1:length(nuttTry)
     nutt = nuttTry(aLoop); 
     Gtt = Et/(2*(1+nutt));
@@ -173,21 +238,25 @@ for aLoop = 1:length(nuttTry)
         MindentVlassak(aLoop,bLoop) = MIndent(1);
     end
 end
-plot(nuttTry,MIndentDU(:,1),'bs-','MarkerFaceColor','b')
+if modelsToCompare(3)
+    plot(nuttTry,MIndentDU(:,1),'Marker',ctrl.marker{1},linePlotInstructions{:});
+    hold on
+    plot(nuttTry,MIndentDU(:,2),'Marker',ctrl.marker{2},linePlotInstructions{:});
+end
+plot(nuttTry,MindentVlassak(:,1),'Marker',ctrl.marker{3},linePlotInstructions{:});
 hold on
-plot(nuttTry,MIndentDU(:,2),'bs-.','MarkerFaceColor','b')
-plot(nuttTry,MindentVlassak(:,1),'r^-','MarkerFaceColor','r')
-plot(nuttTry,MindentVlassak(:,2),'r^-.','MarkerFaceColor','r')
-xlabel('$\nu_{TT}$ [-]','interpreter','latex')
-ylabel('$M$ [GPa]','interpreter','latex')
-plot(nuttJager90(:,1),nuttJager90(:,2),'ko-','MarkerFaceColor','k')
-plot(nuttJager0(:,1),nuttJager0(:,2),'ko-.','MarkerFaceColor','k')
-legend('D\&U, $M_L$','D\&U, $M_T$',...
-       'V et al, 90$^\circ$','V et al, 0$^\circ$',...
-       'J et al, 90$^\circ$','J et al, 0$^\circ$','location','best','interpreter','latex')
-set(gca,'TickLabelInterpreter','latex','fontsize',14) 
-xlim([0 0.6])
-ylim([5 35])
+plot(nuttTry,MindentVlassak(:,2),'Marker',ctrl.marker{4},linePlotInstructions{:});
+xlabel(xAxisText{5},'interpreter',ctrl.interpreter)
+ylabel(yAxisText,'interpreter',ctrl.interpreter)
+if modelsToCompare(2)
+    plot(nuttJager0(:,1),nuttJager0(:,2),'Marker',ctrl.marker{5},linePlotInstructions{:});
+    hold on
+    plot(nuttJager90(:,1),nuttJager90(:,2),'Marker',ctrl.marker{6},linePlotInstructions{:});
+end
+legend(legendText,'location','best','interpreter',ctrl.interpreter)
+set(gca,axisPlotInstructions{:})
+xlim([0 1.0])
+ylim(yLimVals)
 pause(0.5)
 
 clear MindentVlassak
@@ -202,19 +271,24 @@ for aLoop = 1:length(MFAToTry)
     MIndent = vlassakMethod([El ; Et ; Glt ; nutt ; nutl ; MFAToTry(aLoop)],'Cone');
     MindentVlassak(aLoop) = MIndent(1);
 end
-subplot(3,2,6)
-plot([MFAToTry],MindentVlassak,'r^-','MarkerFaceColor','r')
+subplot(plotDims(1),plotDims(2),6)
+plot([MFAToTry],MindentVlassak,'Marker',ctrl.marker{1},linePlotInstructions{:});
 hold on
-legend('V et al','location','best','interpreter','latex')
-xlabel('MFA [Deg]','interpreter','latex')
-ylabel('$M$ [GPa]','interpreter','latex')
-set(gca,'TickLabelInterpreter','latex','fontsize',14) 
+
+legend('V et al.','location','best','interpreter',ctrl.interpreter)
+xlabel(xAxisText{6},'interpreter',ctrl.interpreter)
+ylabel(yAxisText,'interpreter',ctrl.interpreter)
+set(gca,axisPlotInstructions{:})
 xlim([-10 100])
-ylim([5 35])   
+ylim(yLimVals)   
 pause(0.5)    
     
     
 
 
-
+% Image export
+print([ctrl.workDir filesep 'plots' filesep 'compareSolutionScheme'],'-dpng','-r0')
+print([ctrl.workDir filesep 'plots' filesep 'compareSolutionScheme'],'-dpdf')
+% print([ctrl.workDir filesep 'plots' filesep 'compareSolutionSchemeBW'],'-dpng','-r0')
+% export_fig compareSolutionScheme -r600 -png -jpg -tiff
 

@@ -1,8 +1,38 @@
-function compareIndenters()
+function compareIndenters(ctrl)
 
 
+legendText = {};
+legendText{end+1} = 'D\&U, $M_L$, cone';
+legendText{end+1} = 'D\&U, $M_T$, cone';
 
+legendText{end+1} = 'V et al. $M_L$, cone';
+legendText{end+1} = 'V et al. $M_T$, cone';
 
+legendText{end+1} = 'V et al. $M_L$, sphere';
+legendText{end+1} = 'V et al. $M_T$, sphere';    
+
+fontSize = 10;
+
+if strcmp(ctrl.interpreter,'tex')
+    xAxisText = {'E_L [GPa]',    ...
+                 'E_T [GPa]',    ...
+                 'G_{LT} [GPa]', ...
+                 '\nu_{TL} [-]', ...
+                 '\nu_{TT} [-]', ...
+                 'MFA [Deg]'};
+    yAxisText = 'M [GPa]';
+    legendText = strrep(legendText,'$','');
+    legendText = strrep(legendText,'\&','&');
+elseif strcmp(ctrl.interpreter,'latex')
+    xAxisText = {'$E_L$ [GPa]',    ...
+                 '$E_T$ [GPa]',    ...
+                 '$G_{LT}$ [GPa]', ...
+                 '$\nu_{TL}$ [-]', ...
+                 '$\nu_{TT}$ [-]', ...
+                 '$MFA$ [Deg]'};
+    yAxisText = '$M$ [GPa]';
+end
+yLimVals = [5 30];
 
 % Baseline values used in Figure 4
 El = 55*1e0;
@@ -19,8 +49,16 @@ nutlTry = [linspace(0,0.49,20) 0.25];
 nuttTry = [linspace(0,0.49,20) 0.25];
 MFAToTry = [0 90];
 
+
+linePlotInstructions = {'linewidth',ctrl.linewidth};
+axisPlotInstructions = {'TickLabelInterpreter',ctrl.interpreter, ...
+                        'fontsize',fontSize,                     ...
+                        'YMinorGrid',1,'XMinorTick',1};
+                    
+
+
 % Loop over the values used in [1] to generate comparison.
-figure;
+figure('color','w','units','centimeters','OuterPosition',[10 10 24 24]);
 subplot(3,2,2)
 for aLoop = 1:length(ELTry)
     El = ELTry(aLoop);   
@@ -34,25 +72,19 @@ for aLoop = 1:length(ELTry)
 
 end
 
-
-
-
-plot(ELTry,MIndentDUCone(:,1),'bs-','MarkerFaceColor','b')
+plot(ELTry,MIndentDUCone(:,1),'Marker',ctrl.marker{1},linePlotInstructions{:});
 hold on
-plot(ELTry,MIndentDUCone(:,2),'bs-.','MarkerFaceColor','b')
-plot(ELTry,MindentVlassakCone(:,1),'r^-','MarkerFaceColor','r')
-plot(ELTry,MindentVlassakCone(:,2),'r^-.','MarkerFaceColor','r')
-plot(ELTry,MindentVlassakSphere(:,1),'ko-','MarkerFaceColor','k')
-plot(ELTry,MindentVlassakSphere(:,2),'ko-.','MarkerFaceColor','k')
-xlabel('$E_L$ [GPa]','interpreter','latex')
-ylabel('$M$ [GPa]','interpreter','latex')
-legend('D\&U, $M_L$, cone','D\&U, $M_T$, cone',...
-       'V et al, 90$^\circ$','V et al, 0$^\circ$',...
-       'V et al, 90$^\circ$, sphere','V et al, 0$^\circ$, sphere',...
-       'location','best','interpreter','latex')
-set(gca,'TickLabelInterpreter','latex','fontsize',14)
+plot(ELTry,MIndentDUCone(:,2),'Marker',ctrl.marker{2},linePlotInstructions{:});
+plot(ELTry,MindentVlassakCone(:,1),'Marker',ctrl.marker{3},linePlotInstructions{:});
+plot(ELTry,MindentVlassakCone(:,2),'Marker',ctrl.marker{4},linePlotInstructions{:});
+plot(ELTry,MindentVlassakSphere(:,1),'Marker',ctrl.marker{5},linePlotInstructions{:});
+plot(ELTry,MindentVlassakSphere(:,2),'Marker',ctrl.marker{6},linePlotInstructions{:});
+xlabel(xAxisText{1},'interpreter',ctrl.interpreter)
+ylabel(yAxisText,'interpreter',ctrl.interpreter)
+% legend(legendText,'location','best','interpreter',ctrl.interpreter)
+set(gca,axisPlotInstructions{:})
 xlim([20 90])
-ylim([5 35])
+ylim(yLimVals)
 pause(0.5)
 
 
@@ -69,20 +101,19 @@ for aLoop = 1:length(ETTry)
         MindentVlassakSphere(aLoop,bLoop) = vlassakMethod([El ; Et ; Glt ; nutt ; nutl ; MFAToTry(bLoop)],'Sphere');
     end
 end
-plot(ETTry,MIndentDUCone(:,1),'bs-','MarkerFaceColor','b')
+plot(ETTry,MIndentDUCone(:,1),'Marker',ctrl.marker{1},linePlotInstructions{:});
 hold on
-plot(ETTry,MIndentDUCone(:,2),'bs-.','MarkerFaceColor','b')
-plot(ETTry,MindentVlassakCone(:,1),'r^-','MarkerFaceColor','r')
-plot(ETTry,MindentVlassakCone(:,2),'r^-.','MarkerFaceColor','r')
-plot(ETTry,MindentVlassakSphere(:,1),'ko-','MarkerFaceColor','k')
-plot(ETTry,MindentVlassakSphere(:,2),'ko-.','MarkerFaceColor','k')
-legend('D\&U, $M_L$, cone','D\&U, $M_T$, cone',...
-       'V et al, 90$^\circ$','V et al, 0$^\circ$',...
-       'V et al, 90$^\circ$, sphere','V et al, 0$^\circ$, sphere',...
-       'location','best','interpreter','latex')
-set(gca,'TickLabelInterpreter','latex','fontsize',14) 
-xlim([0 20])
-ylim([5 35])
+plot(ETTry,MIndentDUCone(:,2),'Marker',ctrl.marker{2},linePlotInstructions{:});
+plot(ETTry,MindentVlassakCone(:,1),'Marker',ctrl.marker{3},linePlotInstructions{:});
+plot(ETTry,MindentVlassakCone(:,2),'Marker',ctrl.marker{4},linePlotInstructions{:});
+plot(ETTry,MindentVlassakSphere(:,1),'Marker',ctrl.marker{5},linePlotInstructions{:});
+plot(ETTry,MindentVlassakSphere(:,2),'Marker',ctrl.marker{6},linePlotInstructions{:});
+
+set(gca,axisPlotInstructions{:})
+xlabel(xAxisText{2},'interpreter',ctrl.interpreter)
+ylabel(yAxisText,'interpreter',ctrl.interpreter)
+xlim([3 18])
+ylim(yLimVals)
 pause(0.5)
 
 
@@ -98,20 +129,19 @@ for aLoop = 1:length(GLTTry)
         MindentVlassakSphere(aLoop,bLoop) = vlassakMethod([El ; Et ; Glt ; nutt ; nutl ; MFAToTry(bLoop)],'Sphere');
     end
 end
-plot(GLTTry,MIndentDUCone(:,1),'bs-','MarkerFaceColor','b')
+plot(GLTTry,MIndentDUCone(:,1),'Marker',ctrl.marker{1},linePlotInstructions{:});
 hold on
-plot(GLTTry,MIndentDUCone(:,2),'bs-.','MarkerFaceColor','b')
-plot(GLTTry,MindentVlassakCone(:,1),'r^-','MarkerFaceColor','r')
-plot(GLTTry,MindentVlassakCone(:,2),'r^-.','MarkerFaceColor','r')
-plot(GLTTry,MindentVlassakSphere(:,1),'ko-','MarkerFaceColor','k')
-plot(GLTTry,MindentVlassakSphere(:,2),'ko-.','MarkerFaceColor','k')
-legend('D\&U, $M_L$, cone','D\&U, $M_T$, cone',...
-       'V et al, 90$^\circ$','V et al, 0$^\circ$',...
-       'V et al, 90$^\circ$, sphere','V et al, 0$^\circ$, sphere',...
-       'location','best','interpreter','latex')
-set(gca,'TickLabelInterpreter','latex','fontsize',14) 
+plot(GLTTry,MIndentDUCone(:,2),'Marker',ctrl.marker{2},linePlotInstructions{:});
+plot(GLTTry,MindentVlassakCone(:,1),'Marker',ctrl.marker{3},linePlotInstructions{:});
+plot(GLTTry,MindentVlassakCone(:,2),'Marker',ctrl.marker{4},linePlotInstructions{:});
+plot(GLTTry,MindentVlassakSphere(:,1),'Marker',ctrl.marker{5},linePlotInstructions{:});
+plot(GLTTry,MindentVlassakSphere(:,2),'Marker',ctrl.marker{6},linePlotInstructions{:});
+
+set(gca,axisPlotInstructions{:})
+xlabel(xAxisText{3},'interpreter',ctrl.interpreter)
+ylabel(yAxisText,'interpreter',ctrl.interpreter)
 xlim([0 6])
-ylim([5 35])
+ylim(yLimVals)
 pause(0.5)
 
 
@@ -126,20 +156,18 @@ for aLoop = 1:length(nutlTry)
         MindentVlassakSphere(aLoop,bLoop) = vlassakMethod([El ; Et ; Glt ; nutt ; nutl ; MFAToTry(bLoop)],'Sphere');
     end
 end
-plot(nutlTry,MIndentDUCone(:,1),'bs-','MarkerFaceColor','b')
+plot(nutlTry,MIndentDUCone(:,1),'Marker',ctrl.marker{1},linePlotInstructions{:});
 hold on
-plot(nutlTry,MIndentDUCone(:,2),'bs-.','MarkerFaceColor','b')
-plot(nutlTry,MindentVlassakCone(:,1),'r^-','MarkerFaceColor','r')
-plot(nutlTry,MindentVlassakCone(:,2),'r^-.','MarkerFaceColor','r')
-plot(nutlTry,MindentVlassakSphere(:,1),'ko-','MarkerFaceColor','k')
-plot(nutlTry,MindentVlassakSphere(:,2),'ko-.','MarkerFaceColor','k')
-legend('D\&U, $M_L$, cone','D\&U, $M_T$, cone',...
-       'V et al, 90$^\circ$','V et al, 0$^\circ$',...
-       'V et al, 90$^\circ$, sphere','V et al, 0$^\circ$, sphere',...
-       'location','best','interpreter','latex')
-set(gca,'TickLabelInterpreter','latex','fontsize',14) 
+plot(nutlTry,MIndentDUCone(:,2),'Marker',ctrl.marker{2},linePlotInstructions{:});
+plot(nutlTry,MindentVlassakCone(:,1),'Marker',ctrl.marker{3},linePlotInstructions{:});
+plot(nutlTry,MindentVlassakCone(:,2),'Marker',ctrl.marker{4},linePlotInstructions{:});
+plot(nutlTry,MindentVlassakSphere(:,1),'Marker',ctrl.marker{5},linePlotInstructions{:});
+plot(nutlTry,MindentVlassakSphere(:,2),'Marker',ctrl.marker{6},linePlotInstructions{:});
+set(gca,axisPlotInstructions{:})
+xlabel(xAxisText{4},'interpreter',ctrl.interpreter)
+ylabel(yAxisText,'interpreter',ctrl.interpreter)
 xlim([0 0.6])
-ylim([5 35])
+ylim(yLimVals)
 pause(0.5)
 
 
@@ -155,20 +183,19 @@ for aLoop = 1:length(nuttTry)
         MindentVlassakSphere(aLoop,bLoop) = vlassakMethod([El ; Et ; Glt ; nutt ; nutl ; MFAToTry(bLoop)],'Sphere');
     end
 end
-plot(nuttTry,MIndentDUCone(:,1),'bs-','MarkerFaceColor','b')
+plot(nuttTry,MIndentDUCone(:,1),'Marker',ctrl.marker{1},linePlotInstructions{:});
 hold on
-plot(nuttTry,MIndentDUCone(:,2),'bs-.','MarkerFaceColor','b')
-plot(nuttTry,MindentVlassakCone(:,1),'r^-','MarkerFaceColor','r')
-plot(nuttTry,MindentVlassakCone(:,2),'r^-.','MarkerFaceColor','r')
-plot(nuttTry,MindentVlassakSphere(:,1),'ko-','MarkerFaceColor','k')
-plot(nuttTry,MindentVlassakSphere(:,2),'ko-.','MarkerFaceColor','k')
-legend('D\&U, $M_L$, cone','D\&U, $M_T$, cone',...
-       'V et al, 90$^\circ$','V et al, 0$^\circ$',...
-       'V et al, 90$^\circ$, sphere','V et al, 0$^\circ$, sphere',...
-       'location','best','interpreter','latex')
-set(gca,'TickLabelInterpreter','latex','fontsize',14) 
-xlim([0 0.6])
-ylim([5 35])
+plot(nuttTry,MIndentDUCone(:,2),'Marker',ctrl.marker{2},linePlotInstructions{:});
+plot(nuttTry,MindentVlassakCone(:,1),'Marker',ctrl.marker{3},linePlotInstructions{:});
+plot(nuttTry,MindentVlassakCone(:,2),'Marker',ctrl.marker{4},linePlotInstructions{:});
+plot(nuttTry,MindentVlassakSphere(:,1),'Marker',ctrl.marker{5},linePlotInstructions{:});
+plot(nuttTry,MindentVlassakSphere(:,2),'Marker',ctrl.marker{6},linePlotInstructions{:});
+set(gca,axisPlotInstructions{:})
+xlabel(xAxisText{5},'interpreter',ctrl.interpreter)
+ylabel(yAxisText,'interpreter',ctrl.interpreter)
+legend(legendText,'location','best','interpreter',ctrl.interpreter)
+xlim([0 1.0])
+ylim(yLimVals)
 pause(0.5)
 
 
@@ -185,14 +212,21 @@ for aLoop = 1:length(MFAToTry)
     MindentVlassakSphere(aLoop) = vlassakMethod([El ; Et ; Glt ; nutt ; nutl ; MFAToTry(aLoop)],'Sphere');
 end
 subplot(3,2,6)
-plot([MFAToTry],MindentVlassakCone,'r^-','MarkerFaceColor','r')
+plot(MFAToTry,MindentVlassakCone,'Marker',ctrl.marker{1},linePlotInstructions{:});
 hold on
-plot([MFAToTry],MindentVlassakSphere,'b^-','MarkerFaceColor','b')
-legend('V et al, Cone','V et al, Sphere','location','best','interpreter','latex')
-xlabel('MFA [Deg]','interpreter','latex')
-ylabel('$M$ [GPa]','interpreter','latex')
-set(gca,'TickLabelInterpreter','latex','fontsize',14) 
+plot(MFAToTry,MindentVlassakSphere,'Marker',ctrl.marker{2},linePlotInstructions{:});
+xlabel(xAxisText{6},'interpreter',ctrl.interpreter)
+ylabel(yAxisText,'interpreter',ctrl.interpreter)
+set(gca,axisPlotInstructions{:})
+legend('V et al., cone','V et al., sphere','location','best','interpreter',ctrl.interpreter)
 xlim([-10 100])
-ylim([5 35])   
+ylim(yLimVals)   
 pause(0.5)    
 
+
+
+% Image export
+% Image export
+print([ctrl.workDir filesep 'plots' filesep 'compareIndenters'],'-dpng','-r0')
+print([ctrl.workDir filesep 'plots' filesep 'compareIndenters'],'-dpdf')
+% export_fig compareIndenters -r600 -png -jpg -tiff

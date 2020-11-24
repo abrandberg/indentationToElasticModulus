@@ -1,0 +1,3 @@
+[submodule "MM_Tensor"]
+	path = MM_Tensor
+	url = https://github.com/abrandberg/MM_Tensor

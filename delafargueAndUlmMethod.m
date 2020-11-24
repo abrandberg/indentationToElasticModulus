@@ -93,8 +93,17 @@ eccentricity = sqrt( 2*abs(HC1) / (H0 + abs(HC1)) );
 % Text between EQ-22 and EQ-23 in [1]
 
 
-M1 = 1/(2*E * H2^(0.75) * H3^(0.25));   % Real form
-M1 = 1/(pi * H2^(0.5) * H3^(0.5));      % Simplified form
+
+
+
+if strcmp(indenterType,'Cone')
+    M1 = 1/(2*E * H2^(0.75) * H3^(0.25));   % Real form
+    M1 = 1/(pi * H2^(0.5) * H3^(0.5));      % Simplified form
+elseif strcmp(indenterType,'Sphere')
+    M1 = 1/(2*sqrt(2-eccentricity^2) * H2^(0.75) * H3^(0.25));
+end
+
+
 % Indentation modulus expected when indenting normal to the axis of symmetry
 % EQ-22 in [1]
 

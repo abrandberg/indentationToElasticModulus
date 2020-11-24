@@ -1,4 +1,9 @@
-function MIndent = vlassakMethod(matProps,indenterType)
+function MIndent = vlassakMethod(matProps,indenterType,normalVector)
+
+if nargin < 3
+    normalVector = [0 0 1];
+end
+
 % Hard-link to the properties
 El = matProps(1);
 Et = matProps(2);
@@ -16,7 +21,6 @@ R_AA = makeAngleAxisRotation(MFA, [1 0 0]);
 C = rotateS4(C, R_AA);
 
 % Indentation in the longitudinal direction
-normalVector = [0 0 1];
 [alpha,ecc] = alphaFcn(C,normalVector,indenterType);
 Meqv = 1 ./ (alpha * (1 - ecc^2)^0.25);
 MIndent(1) = Meqv;

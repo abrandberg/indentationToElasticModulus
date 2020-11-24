@@ -3,7 +3,8 @@ function [alpha,ecc] = alphaFcn(C,normalVector,indenterType)
 
 % Discretization for numerical integration
 numSteps = 1*60;
-angleVec = linspace(0,180,numSteps);
+angleVec = linspace(0,180-180/numSteps,numSteps);
+
 hSave = hIntegralVlassak(0,C,normalVector,angleVec,0);
 
 
