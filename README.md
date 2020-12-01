@@ -13,6 +13,7 @@ This can be used to study the effect of
 
 ## How do I get set up?
 1. Clone or download this repository. The best way is to issue
+
      $ git clone --recurse-submodules https://github.com/abrandberg/indentationToElasticModulus.git
      
 2. This repository uses the tensor manipulation library MMTensor, originally hosted at
