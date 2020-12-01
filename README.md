@@ -12,11 +12,18 @@ This can be used to study the effect of
 
 
 ## How do I get set up?
-1. Clone this repository.
-2. Download the conventient tensor manipulation library 
+1. Clone or download this repository.
+2. This repository uses the tensor manipulation library MMTensor, originally hosted at
 
      Maarten Moesen (2020). MMTensor 1.0 (https://www.mathworks.com/matlabcentral/fileexchange/32891-mmtensor-1-0).
-3. Put MMTensor in the path of MATLAB.
+     
+   A copy of this repository is hosted on Github (https://github.com/abrandberg/MM_Tensor) and is included as a submodule in this repository. Submodules are not initiated by default when you clone a repository. To clone the submodule as well, you can call (while standing in the *indentationToElasticModulus* repository)
+   
+   $ git submodule init
+   $ git submodule update
+   
+ This will clone the submodule.
+
 
 
 ## Where can I read more about the equations implemented?
