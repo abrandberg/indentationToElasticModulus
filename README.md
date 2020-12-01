@@ -1,4 +1,6 @@
 # indentationToElasticModulus
+[![DOI](https://zenodo.org/badge/284710880.svg)](https://zenodo.org/badge/latestdoi/284710880)
+
 This repository takes a stiffness tensor and an indentation direction and calculates the expected indentation modulus. 
 
 
