@@ -2,7 +2,17 @@
 %
 % AFM-NI: Script for relating the indentation modulus to the elastic constants. 
 %
+% This code generate the figures of the manuscript
+% Estimation of the in-situ elastic constants of wood pulp fibers in freely
+% dried paper via AFM experiments
 %
+% C. Czibula, A. Brandberg, M. J. Cordill, A. Matković, O. Glushko, 
+% Ch. Czibula, A. Kulachenko, C. Teichert, U. Hirn
+%
+% In prep. 2020.
+%
+% created by: August Brandberg augustbr at kth dot se
+% date: 2020-12-01
 %
 
 % Meta instructions
@@ -84,7 +94,7 @@ end
 finalState.pyr = x;   
 
 
-Mexp(1) = 7.70;%7.45; % Hemispherical indenter
+Mexp(1) = 7.70;  % Hemispherical indenter
 Mexp(2) = 2.92;
 
 costFcn = @(x) delafargueAndUlmMethod([x ; GTL ; nuTT ; nuTL],'Cone');
