@@ -11,6 +11,38 @@
 %
 % In prep. 2020.
 %
+% ABOUT:
+%  - Throughout this repository, 
+%     > D & U refers to the paper by Delafargue & Ulm
+%     > V et al. refers to the paper by Vlassak and co-authors
+%     > J et al. refers to the paper by Jäger and co-authors
+%     > FEM refers to pre-computed finite element solutions. The FEM programs
+%       necessary to generate these results can be found in the repository
+%
+%       https://github.com/abrandberg/femIndentationModel.git
+%
+%  - The inputs necessary to generate the estimates of indentation modulus
+%       in the longitudinal and transverse direction of the fiber, respectively,
+%       are calculated using the repository
+%
+%       https://github.com/abrandberg/nanoindentation.git
+%
+%  - The raw files necessary as input for the repository above are currently
+%       embargoed, pending acceptance of this work. Upon publication, the raw
+%       data will be released and a link to the data will be added here.
+%
+% References:
+%[1] Delafargue A, Ulm FJ. 
+%    Explicit approximations of the indentation modulus of elastically orthotropic solids for conical indenters.
+%    Int J Solids Struct 2004;41:7351–60. https://doi.org/10.1016/j.ijsolstr.2004.06.019.
+%[2] Jäger A, Bader T, Hofstetter K, Eberhardsteiner J. 
+%    The relation between indentation modulus, microfibril angle, and elastic properties of wood cell walls.
+%    Compos Part A Appl Sci Manuf 2011;42:677–85. https://doi.org/10.1016/j.compositesa.2011.02.007.
+%[3] Vlassak JJ, Ciavarella M, Barber JR, Wang X.
+%    The indentation modulus of elastically anisotropic materials for indenters of arbitrary shape. 
+%    J Mech Phys Solids 2003;51:1701–21. https://doi.org/10.1016/S0022-5096(03)00066-8.
+%
+%
 % created by: August Brandberg augustbr at kth dot se
 % date: 2020-12-01
 %
@@ -107,7 +139,6 @@ if strcmp(ctrl.optiSolver,'fminunc')
     [x,fval,exitflag,output] = fminunc(optiFcn,Mexp',options);
 
 elseif strcmp(ctrl.optiSolver,'fmincon')
-    
 	conFcn =  @(x) constraintFmincon([x ; GTL ; nuTT ; nuTL]);
     opts = optimoptions(@fmincon,'Display','iter');       
     [x,fval,exitflag,output] =  fmincon(optiFcn,                ... % Minimization function
@@ -122,5 +153,6 @@ finalState.hemi = x;
 gridSearch(ctrl,optiFcn,Mexp,finalState)
 
 
-% This final function probes the sensitivity to MFA/offset. It is very slow.
+
 sensitivityToMFA(ctrl)
+% This final function probes the sensitivity to MFA/offset. Very slow.
