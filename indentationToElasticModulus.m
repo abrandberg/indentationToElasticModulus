@@ -48,7 +48,7 @@
 %
 
 % Meta instructions
-clear; close all; clc
+clear;  clc ; %close all;
 format compact
 
 ctrl.workDir = cd;
@@ -78,6 +78,7 @@ set(groot,'defaultAxesColorOrder',Color);
 
 mkdir('plots')
 
+if 0
 compareSolutionScheme(ctrl,[1 1 1]);
 % Compare Delafargue & Ulm, Vlassak et al. with the curves from Jäger et al. 
 
@@ -94,7 +95,7 @@ evaluateElasticityAssumptionWithFEM(ctrl);
 
 evaluateAssumptionsWithFEM(ctrl);
 % Evaluate assumptions with FEM
-
+end
 
 
 % Sample error minimization routine
@@ -102,55 +103,56 @@ GTL  = 2.51;
 nuTT = 0.25;
 nuTL = 0.25;
 
-Mexp(1) = 5.85;%4.37; % Pyramidal indenter
-Mexp(2) = 2.92;
 
+
+
+% Pyramidal Indenter, mean
+Mexp(1) = 6.9931;%8.9113;
+Mexp(2) = 1.5661;
 costFcn = @(x) delafargueAndUlmMethod([x ; GTL ; nuTT ; nuTL],'Cone');
-optiFcn = @(x) sqrt(1/2 * sum( (costFcn(x) - Mexp).^2./Mexp));                              
-                                
-ctrl.optiSolver = 'fmincon';                  
- % Set optimization options
-if strcmp(ctrl.optiSolver,'fminunc')
-    options = optimoptions(@fminunc,'Display','iter');
-    [x,fval,exitflag,output] = fminunc(optiFcn,Mexp',options);
+optiFcn = @(x) 1/2 * sqrt( sum( (costFcn(x) - Mexp).^2./Mexp));                              
+finalState.pyrMean = obtainStiffnessComponentEstimate(ctrl,Mexp,optiFcn);  
 
-elseif strcmp(ctrl.optiSolver,'fmincon')
-	conFcn =  @(x) constraintFmincon([x ; GTL ; nuTT ; nuTL]);
-    opts = optimoptions(@fmincon,'Display','iter');       
-    [x,fval,exitflag,output] =  fmincon(optiFcn,                ... % Minimization function
-                                        Mexp(1:2)',             ... % Starting guess
-                                        [],[],[],[],[],[],      ... % Linear equality and inequality constraints
-                                        conFcn,                 ... % Non-linear inequality an equality constraints
-                                        opts);                      % Solver options
-end    
-finalState.pyr = x;   
-
-
-Mexp(1) = 7.70;  % Hemispherical indenter
-Mexp(2) = 2.92;
-
+% Pyramidal Indenter, median
+Mexp(1) = 4.1755;%6.4216;
+Mexp(2) = 1.5751;
 costFcn = @(x) delafargueAndUlmMethod([x ; GTL ; nuTT ; nuTL],'Cone');
-optiFcn = @(x) sqrt(1/2 * sum( (costFcn(x) - Mexp).^2./Mexp));                              
-                                
-ctrl.optiSolver = 'fminunc';                       
- % Set optimization options
-if strcmp(ctrl.optiSolver,'fminunc')
-    options = optimoptions(@fminunc,'Display','iter');
-    [x,fval,exitflag,output] = fminunc(optiFcn,Mexp',options);
+optiFcn = @(x) 1/2 * sqrt( sum( (costFcn(x) - Mexp).^2./Mexp));                              
+finalState.pyrMedian = obtainStiffnessComponentEstimate(ctrl,Mexp,optiFcn);  
 
-elseif strcmp(ctrl.optiSolver,'fmincon')
-	conFcn =  @(x) constraintFmincon([x ; GTL ; nuTT ; nuTL]);
-    opts = optimoptions(@fmincon,'Display','iter');       
-    [x,fval,exitflag,output] =  fmincon(optiFcn,                ... % Minimization function
-                                        Mexp(1:2)',             ... % Starting guess
-                                        [],[],[],[],[],[],      ... % Linear equality and inequality constraints
-                                        conFcn,                 ... % Non-linear inequality an equality constraints
-                                        opts);                      % Solver options
-end
-finalState.hemi = x;                      
-                                
 
-gridSearch(ctrl,optiFcn,Mexp,finalState)
+
+% Nano Indenter, mean
+Mexp(1) = 5.7524;
+Mexp(2) = 1.5661;
+costFcn = @(x) delafargueAndUlmMethod([x ; GTL ; nuTT ; nuTL],'Cone');
+optiFcn = @(x) 1/2 * sqrt( sum( (costFcn(x) - Mexp).^2./Mexp));                              
+finalState.nanoMean = obtainStiffnessComponentEstimate(ctrl,Mexp,optiFcn);  
+
+% Nano Indenter, median
+Mexp(1) = 6.1501;
+Mexp(2) = 1.5661;
+costFcn = @(x) delafargueAndUlmMethod([x ; GTL ; nuTT ; nuTL],'Cone');
+optiFcn = @(x) 1/2 * sqrt( sum( (costFcn(x) - Mexp).^2./Mexp));                              
+finalState.nanoMedian = obtainStiffnessComponentEstimate(ctrl,Mexp,optiFcn); 
+
+
+
+% Hemisphere Indenter, median
+Mexp(1) = 3.6693;
+Mexp(2) = 1.5661;
+costFcn = @(x) delafargueAndUlmMethod([x ; GTL ; nuTT ; nuTL],'Cone');
+optiFcn = @(x) 1/2 * sqrt( sum( (costFcn(x) - Mexp).^2./Mexp));                              
+finalState.hemiMedian = obtainStiffnessComponentEstimate(ctrl,Mexp,optiFcn);  
+
+% Hemisphere Indenter, mean
+Mexp(1) = 8.5663;
+Mexp(2) = 1.5661;
+costFcn = @(x) delafargueAndUlmMethod([x ; GTL ; nuTT ; nuTL],'Cone');
+optiFcn = @(x) 1/2 * sqrt( sum( (costFcn(x) - Mexp).^2./Mexp));                              
+finalState.hemiMean = obtainStiffnessComponentEstimate(ctrl,Mexp,optiFcn);  
+
+gridSearch_v2(ctrl,optiFcn,Mexp,finalState)
 
 
 

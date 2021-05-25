@@ -15,7 +15,8 @@ function gridSearch(ctrl,optiFcn,Mexp,finalState)
 %
 
 fontSize = 10;
-legendText = {'Error (Hemi-sphere)','Final state (Hemi-sphere)','Final state (Pyramid)','Seidlhofer et al., 2019','Lorbach et al., 2014, a)','Lorbach et al., 2014, b)'};
+% legendText = {'Error (Hemi-sphere)','Final state (Hemi-sphere)','Final state (Pyramid)','Seidlhofer et al., 2019','Lorbach et al., 2014, a)','Lorbach et al., 2014, b)'};
+legendText = {'Error (Hemisphere)','Optimum (Hemisphere)','Optimum (Pyramid)','Micromechanical tests','Cox Equation'};
 xAxisText = '$E_L$ [GPa]';
 yAxisText = '$E_T$ [GPa]';
 
@@ -28,13 +29,16 @@ end
 
 linePlotInstructions = {'linewidth',ctrl.linewidth};
 axisPlotInstructions = {'TickLabelInterpreter',ctrl.interpreter, ...
-                        'fontsize',fontSize};
+                        'fontsize',fontSize,'fontname','Arial','XGrid','off','YGrid','off'};
 
                     
 % Previous studies
 seidlhoferEL = [4.20 3.14 22.94 10.03 21.42 14.94 3.29 9.01]';
 lorbachEL_estimate1 = 20.0;          
 lorbachEL_estimate2 = 17.0;
+
+micromechanicalTests = 11.1205;
+coxInverted = 15.2;
                     
 % Parametric sweep to examine the state found
 
@@ -48,20 +52,24 @@ lorbachEL_estimate2 = 17.0;
         end
     end
 
-figure('color','w','units','centimeters','OuterPosition',[10 10 16 16]);
+% figure('color','w','units','centimeters','OuterPosition',[10 10 16 16]);
+figure('color','w','units','centimeters','OuterPosition',[10 10 15 12]);
 
-contour(X,Y,Z,round(linspace(0.2,max(max(Z)),10),2),'ShowText','off',linePlotInstructions{:}) 
+% contour(X,Y,Z,round(linspace(0.2,max(max(Z)),10),2),'ShowText','on',linePlotInstructions{:}) 
+contour(X,Y,Z,round(linspace(0.1,1,10),2),'ShowText','on',linePlotInstructions{:}) 
     hold on
-    
+%     contour(X+1,Y-0.5,Z,round(linspace(0.1,1,10),2),'ShowText','off',linePlotInstructions{:}) 
     plot(finalState.hemi(1),finalState.hemi(2),'ko','MarkerFaceColor','k','MarkerSize',8)
     plot(finalState.pyr(1),finalState.pyr(2),'ks','MarkerFaceColor','k','MarkerSize',8)
     
     
-plot(mean(seidlhoferEL).*[1 1],min(Mexp).*[0.25 1],'k--','linewidth',2)
-plot(lorbachEL_estimate1.*[1 1],min(Mexp).*[0.25 1],'k-.','linewidth',2)
-plot(lorbachEL_estimate2.*[1 1],min(Mexp).*[0.25 1],'k:','linewidth',2)
+% plot(mean(seidlhoferEL).*[1 1],min(Mexp).*[0.25 1],'k--','linewidth',2)
+% plot(lorbachEL_estimate1.*[1 1],min(Mexp).*[0.25 1],'k-.','linewidth',2)
+% plot(lorbachEL_estimate2.*[1 1],min(Mexp).*[0.25 1],'k:','linewidth',2)
+plot(mean(micromechanicalTests).*[1 1],min(Mexp).*[0.25 1],'k--<','linewidth',1,'markerfacecolor','k')
+plot(coxInverted.*[1 1],min(Mexp).*[0.25 1],'k-.>','linewidth',1,'markerfacecolor','k')
 grid on
-legend(legendText,'interpreter',ctrl.interpreter)
+legend(legendText,'interpreter',ctrl.interpreter,'location','southwest')
 xlabel(xAxisText,'interpreter',ctrl.interpreter)
 ylabel(yAxisText,'interpreter',ctrl.interpreter)
 set(gca,axisPlotInstructions{:})
